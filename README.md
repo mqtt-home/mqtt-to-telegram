@@ -40,8 +40,8 @@ You just need to know the telegram token for your bot to use this app.
 # Docker
 
 ```yaml
-  mqttrules:
-    image: pharndt/mqtttelegram:1.0.1
+  mqtttelegram:
+    image: pharndt/mqtttelegram:1.0.2
     volumes:
      - ./config/mqtttelegram:/var/lib/mqtttelegram:ro
     environment:
