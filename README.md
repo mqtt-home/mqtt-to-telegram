@@ -41,7 +41,7 @@ You just need to know the telegram token for your bot to use this app.
 
 ```yaml
   mqtttelegram:
-    image: pharndt/mqtttelegram:1.0.2
+    image: pharndt/mqtttelegram:1.0.3
     volumes:
      - ./config/mqtttelegram:/var/lib/mqtttelegram:ro
     environment:
