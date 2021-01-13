@@ -1,0 +1,16 @@
+{
+	"mqtt": {
+		"url": "tcp://192.168.2.98:1883",
+		"topic": "telegram",
+		"username": "user",
+		"password": "password"
+	},
+	"telegram": {
+		"token": "telegram-chat-bot-token",
+		"start-code": "start-code-chosen-by-yourself",
+		"chat-ids": {
+			"displayname1": <chat-id-1>,
+			"displayname2": 123456789
+		}
+	}
+}
