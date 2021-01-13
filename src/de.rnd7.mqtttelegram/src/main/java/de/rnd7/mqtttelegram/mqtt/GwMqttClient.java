@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class GwMqttClient {
 	private static final int QOS = 2;
-	private static final String CLIENT_ID = "mqtt-rules";
+	private static final String CLIENT_ID = "mqtt-telegram";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GwMqttClient.class);
 
