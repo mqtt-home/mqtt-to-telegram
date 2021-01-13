@@ -22,6 +22,7 @@ You just need to know the telegram token for your bot to use this app.
 {
   "mqtt": {
     "url": "tcp://192.168.2.98:1883",
+    "client-id": "mqtt-telegram",
     "topic": "telegram",
     "username": "user",
     "password": "password"
