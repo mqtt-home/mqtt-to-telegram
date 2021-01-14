@@ -77,7 +77,7 @@ public class GwMqttClient {
 					// do nothing
 				}
 			});
-			result.subscribe("telegram/#");
+			result.subscribe(config.getTopic() + "/#");
 
 			return Optional.of(result);
 		} catch (final MqttException e) {

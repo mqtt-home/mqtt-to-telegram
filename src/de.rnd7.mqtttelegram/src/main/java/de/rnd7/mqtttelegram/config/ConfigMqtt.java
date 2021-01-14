@@ -8,7 +8,7 @@ public class ConfigMqtt {
     private String url;
     private String username;
     private String password;
-    private String topic = "hue";
+    private String topic = "telegram";
     private boolean retain = true;
 
     @SerializedName("client-id")

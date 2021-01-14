@@ -15,14 +15,13 @@ public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public Main(final Config config) {
-
         LOGGER.debug("Debug enabled");
         LOGGER.info("Info enabled");
 
         final GwMqttClient client = new GwMqttClient(config, Events.getBus());
         Events.register(client);
 
-        Events.register(new BotService(config.getTelegram())
+        Events.register(new BotService(config.getTelegram(), config.getMqtt().getTopic())
                 .start());
     }
 
