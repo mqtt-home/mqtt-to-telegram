@@ -56,7 +56,7 @@ do this yourself. When it turns out that more users, and not just me, use this, 
 
 ```yaml
   mqtttelegram:
-     image: pharndt/mqtttelegram:1.0.3
+     image: pharndt/mqtttelegram:1.0.4
      volumes:
         - ./config/mqtttelegram:/var/lib/mqtttelegram:ro
      environment:
