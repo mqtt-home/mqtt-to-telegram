@@ -6,6 +6,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      RELEASE_VERSION: 1.1.0-b${{ github.run_number }}
 
     steps:
       - name: Checkout
@@ -16,8 +18,17 @@ jobs:
         with:
           java-version: 8
 
+      - name: Update version to ${{env.RELEASE_VERSION}}
+        env:
+          USENAME: ${{github.actor}}
+          PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$RELEASE_VERSION --file src/pom.xml --settings .github/workflows/settings.xml
+
       - name: Build with Maven
-        run: mvn -B package --file src/pom.xml
+        env:
+          USENAME: ${{github.actor}}
+          PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn -B package verify --file src/pom.xml --settings .github/workflows/settings.xml
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -41,7 +52,7 @@ jobs:
           push: true
           tags: |
             pharndt/mqtttelegram:latest
-            pharndt/mqtttelegram:1.0.${{ github.run_number }}
+            pharndt/mqtttelegram:${{env.RELEASE_VERSION}}
 
       - name: Create Release
         id: create_release
@@ -49,11 +60,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: '1.0.${{ github.run_number }}'
-          release_name: Release 1.0.${{ github.run_number }}
+          tag_name: ${{env.RELEASE_VERSION}}
+          release_name: ${{env.RELEASE_VERSION}}
           body: |
             Docker tag:
-              pharndt/mqtttelegram:1.0.${{ github.run_number }}
+              `pharndt/mqtttelegram:${{env.RELEASE_VERSION}}`
 
             Changes in this Release
               - ...

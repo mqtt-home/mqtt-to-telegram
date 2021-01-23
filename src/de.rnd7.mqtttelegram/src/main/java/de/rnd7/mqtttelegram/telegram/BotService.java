@@ -3,11 +3,12 @@ package de.rnd7.mqtttelegram.telegram;
 import com.google.common.eventbus.Subscribe;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
-import de.rnd7.mqtttelegram.Events;
-import de.rnd7.mqtttelegram.mqtt.Message;
-import de.rnd7.mqtttelegram.mqtt.PublishMessage;
+import de.rnd7.mqttgateway.Events;
+import de.rnd7.mqttgateway.Message;
+import de.rnd7.mqttgateway.PublishMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,16 +22,14 @@ public class BotService {
 
     private final String token;
     private TelegramBot bot;
-    private final Map<String, Long> chatIdMap;
     private final Map<String, Long> chatIdByTopic;
     private final Map<Long, String> topicByChatId;
     private final Set<Long> chatIds;
     private final String code;
     private final String broadcastTopic;
 
-    public BotService(final ConfigTelegram config, String topic) {
+    public BotService(final ConfigTelegram config, final String topic) {
         this.token = config.getToken();
-        this.chatIdMap = config.getChatIds();
         this.chatIds = new HashSet<>(config.getChatIds().values());
         this.code = config.getCode();
 
@@ -41,49 +40,14 @@ public class BotService {
         config.getChatIds().forEach((name, id) -> {
             chatIdByTopic.put(topic + "/" + name + "/set", id);
             chatIdByTopic.put(topic + "/" + id + "/set", id);
-            topicByChatId.put(id, topic+ "/" + name);
+            topicByChatId.put(id, topic + "/" + name);
         });
     }
 
     public BotService start() {
         bot = new TelegramBot(token);
-        // Register for updates
         bot.setUpdatesListener(updates -> {
-            updates.forEach(update -> {
-                final Long chatId = update.message().chat().id();
-                if (chatIds.contains(chatId)) {
-                    final String topic = topicByChatId.get(chatId);
-                    if (topic != null) {
-                        Events.getBus().post(new PublishMessage(topic, update.message().text()));
-                        final SendResponse response = bot.execute(
-                                new SendMessage(chatId, "ok")
-                        );
-                        LOGGER.info(response.toString());
-                    }
-                    else {
-                        final SendResponse response = bot.execute(
-                                new SendMessage(chatId, "no topic found for the current chat id.")
-                        );
-                        LOGGER.info(response.toString());
-                    }
-                }
-                else {
-                    LOGGER.info("New chat with id: {}", chatId);
-
-                    if (update.message().text().equals(code)) {
-                        final SendResponse response = bot.execute(
-                                new SendMessage(chatId, "Ok! You chat id is:\n" + chatId)
-                        );
-                        LOGGER.info(response.toString());
-                    }
-                    else {
-                        final SendResponse response = bot.execute(
-                                new SendMessage(chatId, "Hi! Please enter your start-code.")
-                        );
-                        LOGGER.info(response.toString());
-                    }
-                }
-            });
+            updates.forEach(this::handleUpdate);
 
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
         });
@@ -91,12 +55,42 @@ public class BotService {
         return this;
     }
 
+    private void handleUpdate(final Update update) {
+        final Long chatId = update.message().chat().id();
+        if (chatIds.contains(chatId)) {
+            final String topic = topicByChatId.get(chatId);
+            if (topic != null) {
+                Events.post(PublishMessage.absolute(topic, update.message().text()));
+                sendTelegram(chatId, "ok");
+            } else {
+                sendTelegram(chatId, "no topic found for the current chat id.");
+            }
+        } else {
+            LOGGER.info("New chat with id: {}", chatId);
+
+            if (update.message().text().equals(code)) {
+                sendTelegram(chatId, "Ok! You chat id is:\n" + chatId);
+            } else {
+                sendTelegram(chatId, "Hi! Please enter your start-code.");
+            }
+        }
+    }
+
+    private void sendTelegram(final long chatId, final String message) {
+        final SendResponse response = bot.execute(
+            new SendMessage(chatId, message)
+        );
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info(response.toString());
+        }
+    }
+
     @Subscribe
-    public void onMessage(Message message) {
+    public void onMessage(final Message message) {
         if (message.getTopic().equals(this.broadcastTopic)) {
             sendBroadcastMessage(message);
-        }
-        else {
+        } else {
             sendMessage(message);
         }
     }
@@ -104,15 +98,13 @@ public class BotService {
     private void sendMessage(final Message message) {
         final Long chatId = this.chatIdByTopic.get(message.getTopic());
         if (chatId != null) {
-            final SendResponse response = bot.execute(new SendMessage(chatId, message.getRaw()));
-            LOGGER.info(response.toString());
+            sendTelegram(chatId, message.getRaw());
         }
     }
 
     private void sendBroadcastMessage(final Message message) {
         this.chatIds.forEach(chatId -> {
-            final SendResponse response = bot.execute(new SendMessage(chatId, message.getRaw()));
-            LOGGER.info(response.toString());
+            sendTelegram(chatId, message.getRaw());
         });
     }
 }

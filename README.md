@@ -1,17 +1,19 @@
 # mqtt-to-telegram
+
 [![mqtt-smarthome](https://img.shields.io/badge/mqtt-smarthome-blue.svg)](https://github.com/mqtt-smarthome/mqtt-smarthome)
 
-This app provides a bridge between Telegram and MQTT.
-You can post messages to a chat channel by publishing a message on an MQTT topic.
+This app provides a bridge between Telegram and MQTT. You can post messages to a chat channel by publishing a message on
+an MQTT topic.
 
 # Why?
 
 With this project, it is possible to publish messages like `your dishwasher has just finished!`
-or request the lights that are turned on through Telegram. You will need to use
-separate tools to create such messages or react to a message you get from Telegram.
-This tool will convert the messages for you. It follows the principles of `mqtt-smarthome`.
+or request the lights that are turned on through Telegram. You will need to use separate tools to create such messages
+or react to a message you get from Telegram. This tool will convert the messages for you. It follows the principles
+of `mqtt-smarthome`.
 
 ## Example:
+
 1) Publish the MQTT message `hello` to `telegram/displayname/set`
    and the user with the given chat-id will be informed.
 
@@ -22,13 +24,12 @@ This tool will convert the messages for you. It follows the principles of `mqtt-
 
 # How to
 
-You have to create a chat-bot first. Use the telegram `BotFather` to do this.
-You just need to know the telegram token for your bot to use this app.
+You have to create a chat-bot first. Use the telegram `BotFather` to do this. You just need to know the telegram token
+for your bot to use this app.
 
-Open the chat-bot using Telegram and execute `/start`.
-The bot will ask you for your `start-code`. You will get the chat-id as a result.
-The `chat-id` can be inserted into your configuration. At the moment, you have to
-do this yourself. When it turns out that more users, and not just me, use this, we can add this feature.
+Open the chat-bot using Telegram and execute `/start`. The bot will ask you for your `start-code`. You will get the
+chat-id as a result. The `chat-id` can be inserted into your configuration. At the moment, you have to do this yourself.
+When it turns out that more users, and not just me, use this, we can add this feature.
 
 # Config
 

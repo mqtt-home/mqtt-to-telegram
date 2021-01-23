@@ -1,8 +1,9 @@
 package de.rnd7.mqtttelegram;
 
+import de.rnd7.mqttgateway.Events;
+import de.rnd7.mqttgateway.GwMqttClient;
+import de.rnd7.mqttgateway.config.ConfigParser;
 import de.rnd7.mqtttelegram.config.Config;
-import de.rnd7.mqtttelegram.config.ConfigParser;
-import de.rnd7.mqtttelegram.mqtt.GwMqttClient;
 import de.rnd7.mqtttelegram.telegram.BotService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +19,15 @@ public class Main {
         LOGGER.debug("Debug enabled");
         LOGGER.info("Info enabled");
 
-        final GwMqttClient client = new GwMqttClient(config, Events.getBus());
-        Events.register(client);
+        final GwMqttClient client = GwMqttClient.start(config.getMqtt()
+            .setDefaultClientId("mqtt-telegram")
+            .setDefaultTopic("telegram"));
+
+        client.subscribe(config.getMqtt().getTopic() + "/#");
+        client.online();
 
         Events.register(new BotService(config.getTelegram(), config.getMqtt().getTopic())
-                .start());
+            .start());
     }
 
     public static void main(final String[] args) {
@@ -32,7 +37,7 @@ public class Main {
         }
 
         try {
-            new Main(ConfigParser.parse(new File(args[0])));
+            new Main(ConfigParser.parse(new File(args[0]), Config.class));
         } catch (final IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
