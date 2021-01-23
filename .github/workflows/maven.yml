@@ -14,5 +14,8 @@ jobs:
         with:
           java-version: 8
       - name: Build with Maven
-        run: mvn -B package --file src/pom.xml
+        env:
+          USENAME: ${{github.actor}}
+          PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn -B package verify --file src/pom.xml --settings .github/workflows/settings.xml
 
