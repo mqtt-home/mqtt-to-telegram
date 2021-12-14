@@ -1,5 +1,5 @@
 # ---- Prod ----
-FROM amazoncorretto:8u312-alpine3.12-jre
+FROM openjdk:8-jdk-alpine
 RUN mkdir /opt/app
 WORKDIR /opt/app
 COPY src/de.rnd7.mqtttelegram/target/mqtttelegram.jar .
