@@ -18,16 +18,18 @@ public class Main {
     public Main(final Config config) {
         LOGGER.debug("Debug enabled");
         LOGGER.info("Info enabled");
+        try {
+            GwMqttClient.start(config.getMqtt()
+                .setDefaultTopic("telegram")
+            )
+            .online()
+            .subscribe(config.getMqtt().getTopic() + "/#");
 
-        final GwMqttClient client = GwMqttClient.start(config.getMqtt()
-            .setDefaultClientId("mqtt-telegram")
-            .setDefaultTopic("telegram"));
-
-        client.subscribe(config.getMqtt().getTopic() + "/#");
-        client.online();
-
-        Events.register(new BotService(config.getTelegram(), config.getMqtt().getTopic())
-            .start());
+            Events.register(new BotService(config.getTelegram(), config.getMqtt().getTopic())
+                .start());
+        } catch (final Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     public static void main(final String[] args) {

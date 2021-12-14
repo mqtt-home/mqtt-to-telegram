@@ -2,12 +2,17 @@ name: Build release
 
 on:
   workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: 'Version'
+        required: true
+        default: '1.1.0'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      RELEASE_VERSION: 1.1.0-b${{ github.run_number }}
+      RELEASE_VERSION: ${{ github.event.inputs.releaseVersion }}-b${{ github.run_number }}
 
     steps:
       - name: Checkout
