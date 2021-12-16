@@ -22,7 +22,6 @@ public class Main {
             GwMqttClient.start(config.getMqtt()
                 .setDefaultTopic("telegram")
             )
-            .online()
             .subscribe(config.getMqtt().getTopic() + "/#");
 
             Events.register(new BotService(config.getTelegram(), config.getMqtt().getTopic())
